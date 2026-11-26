@@ -3,36 +3,12 @@ import { NavLink } from 'react-router';
 export default function Navbar() {
   return (
     <nav className="navbar">
-      <div className="navbar-brand">
-        <NavLink to="/">MyStore</NavLink>
+      <h2>MyStore</h2>
+      <div className="nav-links">
+        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/about">Chi siamo</NavLink>
+        <NavLink to="/prodotti">Prodotti</NavLink>
       </div>
-      <ul className="navbar-nav">
-        <li>
-          <NavLink 
-            to="/" 
-            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-            end
-          >
-            Home
-          </NavLink>
-        </li>
-        <li>
-          <NavLink 
-            to="/about" 
-            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-          >
-            Chi siamo
-          </NavLink>
-        </li>
-        <li>
-          <NavLink 
-            to="/prodotti" 
-            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-          >
-            Prodotti
-          </NavLink>
-        </li>
-      </ul>
     </nav>
   );
 }

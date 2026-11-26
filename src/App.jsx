@@ -4,9 +4,8 @@ import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
-import NotFoundPage from './pages/NotFoundPage';
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -15,11 +14,8 @@ function App() {
           <Route path="about" element={<AboutPage />} />
           <Route path="prodotti" element={<ProductsPage />} />
           <Route path="prodotti/:id" element={<ProductDetailPage />} />
-          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

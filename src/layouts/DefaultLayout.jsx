@@ -3,13 +3,11 @@ import Navbar from '../components/Navbar';
 
 export default function DefaultLayout() {
   return (
-    <div className="app-layout">
-      <header>
-        <Navbar />
-      </header>
-      <main className="main-content">
+    <>
+      <Navbar />
+      <main>
         <Outlet />
       </main>
-    </div>
+    </>
   );
 }

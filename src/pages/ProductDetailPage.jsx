@@ -1,134 +1,60 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 
 export default function ProductDetailPage() {
+  // 1. Recuperiamo l'id dalla rotta parametrica con useParams
   const { id } = useParams();
+
+  // 2. Hook useNavigate per spostarci tra le pagine da codice
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    // Validazione preventiva dell'id
-    if (!id || isNaN(Number(id))) {
-      navigate('/prodotti', { replace: true });
-      return;
-    }
-
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        setErrorMessage('');
-
-        const response = await fetch(`https://fakestoreapi.com/products/${id}`);
-
-        if (!response.ok) {
-          throw new Error(`Impossibile reperire il prodotto (status ${response.status})`);
+    fetch(`https://fakestoreapi.com/products/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Prodotto non trovato');
         }
-
-        const data = await response.json();
-
-        // fakestoreapi restituisce null o oggetto vuoto quando un id non esiste
-        if (!data || Object.keys(data).length === 0 || !data.id) {
-          throw new Error(`Prodotto con ID #${id} non trovato.`);
+        return res.json();
+      })
+      .then((data) => {
+        // FakeStore API restituisce un oggetto vuoto o nullo se l'id non esiste
+        if (!data || !data.id) {
+          throw new Error('Prodotto inesistente');
         }
-
         setProduct(data);
-      } catch (err) {
-        setErrorMessage(err.message || 'Errore nel caricamento del prodotto.');
-      } finally {
         setLoading(false);
-      }
-    };
-
-    fetchProduct();
+      })
+      .catch((err) => {
+        console.error(err);
+        alert('Prodotto non trovato! Verrai reindirizzato alla lista prodotti.');
+        // Gestione errore: usiamo navigate per tornare alla lista prodotti
+        navigate('/prodotti');
+      });
   }, [id, navigate]);
 
-  // Gestione errore con useNavigate
-  const handleRedirectToProducts = () => {
-    navigate('/prodotti');
-  };
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   if (loading) {
-    return (
-      <div className="state-message loading-state">
-        <div className="spinner"></div>
-        <p>Caricamento dettagli prodotto #{id}...</p>
-      </div>
-    );
+    return <p className="status-text">Caricamento dettaglio prodotto...</p>;
   }
 
-  if (errorMessage || !product) {
-    return (
-      <div className="product-detail-error">
-        <div className="error-card">
-          <span className="error-icon">🔍</span>
-          <h2>Prodotto non trovato</h2>
-          <p>{errorMessage || 'Non è stato possibile trovare il prodotto richiesto.'}</p>
-          <div className="error-actions">
-            <button onClick={handleGoBack} className="btn btn-secondary">
-              ← Torna indietro
-            </button>
-            <button onClick={handleRedirectToProducts} className="btn btn-primary">
-              Tutti i Prodotti
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!product) return null;
 
   return (
-    <div className="product-detail-container">
-      <nav className="breadcrumb">
-        <Link to="/">Home</Link> / <Link to="/prodotti">Prodotti</Link> / <span>{product.title}</span>
-      </nav>
+    <div className="container detail-container">
+      {/* Bottone per tornare indietro usando navigate(-1) */}
+      <button onClick={() => navigate(-1)} className="btn-back">
+        ← Torna indietro
+      </button>
 
-      <div className="product-detail-card">
-        <div className="detail-image-wrapper">
-          <img src={product.image} alt={product.title} className="detail-image" />
-        </div>
-
+      <div className="detail-card">
+        <img src={product.image} alt={product.title} />
         <div className="detail-info">
-          <span className="detail-category">{product.category}</span>
-          <h1 className="detail-title">{product.title}</h1>
-
-          {product.rating && (
-            <div className="detail-rating">
-              <span className="stars">⭐ {product.rating.rate} / 5</span>
-              <span className="reviews">({product.rating.count} recensioni)</span>
-            </div>
-          )}
-
-          <div className="detail-price-box">
-            <span className="detail-price">€ {product.price.toFixed(2)}</span>
-            <span className="tax-included">IVA inclusa</span>
-          </div>
-
-          <div className="detail-description">
-            <h3>Descrizione</h3>
-            <p>{product.description}</p>
-          </div>
-
-          <div className="detail-actions">
-            <button 
-              className="btn btn-primary btn-large"
-              onClick={() => alert(`Aggiunto "${product.title}" al carrello!`)}
-            >
-              🛒 Aggiungi al Carrello
-            </button>
-            <button 
-              onClick={handleGoBack} 
-              className="btn btn-secondary btn-large"
-            >
-              ← Torna indietro
-            </button>
-          </div>
+          <h2>{product.title}</h2>
+          <p className="price">€ {product.price}</p>
+          <p className="category">Categoria: {product.category}</p>
+          <p className="description">{product.description}</p>
         </div>
       </div>
     </div>
